@@ -1,0 +1,61 @@
+mail in nest.js
+npm install --save @nestjs-modules/mailer nodemailer
+npm install --save handlebars
+
+//app.module.ts
+import { Module } from '@nestjs/common';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+
+@Module({
+  imports: [
+    MailerModule.forRoot({
+      transport: 'smtps://user@domain.com:pass@smtp.domain.com',
+      defaults: {
+        from: '"nest-modules" <modules@nestjs.com>',
+      },
+      template: {
+        dir: __dirname + '/templates',
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
+    }),
+  ],
+})
+export class AppModule {}
+
+
+//service
+import { Injectable } from '@nestjs/common';
+import { MailerService } from '@nestjs-modules/mailer';
+
+@Injectable()
+export class ExampleService {
+  constructor(private readonly mailerService: MailerService) {}
+
+  public example(): void {
+    this.mailerService
+      .sendMail({
+        to: 'test@nestjs.com', // list of receivers
+        from: 'noreply@nestjs.com', // sender address
+        subject: 'Testing Nest MailerModule ✔', // Subject line
+        text: 'welcome', // plaintext body
+        html: '<b>welcome</b>', // HTML body content
+      })
+      .then(() => {})
+      .catch(() => {});
+  }
+}
+
+
+//hash password
+npm install bcrypt
+//import this function in controller
+import * as bcrypt from 'bcrypt';
+//code for hash 
+  const saltOrRounds = 10; // The number of salt rounds to use (generally recommended value)
+  const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+
+  //decode
